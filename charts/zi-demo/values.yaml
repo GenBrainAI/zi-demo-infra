@@ -1,0 +1,57 @@
+replicaCount: 3
+
+image:
+  repository: us-central1-docker.pkg.dev/zi-platform/services/api-gateway
+  tag: "2.3.1"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: gce
+  hosts:
+    - host: api.zi-demo.internal
+      paths:
+        - path: /
+          pathType: Prefix
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    cpu: "2"
+    memory: 512Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 15
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+env:
+  - name: LOG_LEVEL
+    value: "info"
+  - name: MAX_CONNECTIONS
+    value: "1000"
+  - name: CACHE_TTL
+    value: "300"
