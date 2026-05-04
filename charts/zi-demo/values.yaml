@@ -55,3 +55,23 @@ env:
     value: "1000"
   - name: CACHE_TTL
     value: "300"
+  - name: DATABASE_URL
+    value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@zi-demo-postgres:5432/zi_platform"
+
+# PostgreSQL database
+postgres:
+  replicas: 1
+  image:
+    repository: postgres
+    tag: "15.4"
+  database: zi_platform
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  storage:
+    size: 10Gi
+    storageClass: premium-rwo
